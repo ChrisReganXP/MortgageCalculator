@@ -16,7 +16,7 @@ namespace MortgageCalculator
             account.ProductSchedule.Add(new MortgageProduct() { APRRate = 4.7m, Years = 25 });
 
             var months = calc.GetRepaymentSchedule(account);
-            OutputPayments(months);
+            OutputPayments(account, months);
         }
 
         public void TestTwo()
@@ -29,18 +29,43 @@ namespace MortgageCalculator
             account.ProductSchedule.Add(new MortgageProduct() { APRRate = 5, Years = 20 });
 
             var months = calc.GetRepaymentSchedule(account);
-            OutputPayments(months);
+            OutputPayments(account, months);
         }
 
-        private void OutputPayments(List<RepaymentScheduleMonth> months)
+        public void TestThree()
+        {
+            MortgageCalculator calc = new MortgageCalculator();
+
+            MortgageAccount account = new MortgageAccount() { InitialBalance = 673857m };
+            account.ProductSchedule = new List<MortgageProduct>();
+            account.ProductSchedule.Add(new MortgageProduct() { APRRate = 5, Years = 20 });
+
+            var months = calc.GetRepaymentSchedule(account);
+            OutputPayments(account, months);
+        }
+
+        public void TestFour()
+        {
+            MortgageCalculator calc = new MortgageCalculator();
+
+            MortgageAccount account = new MortgageAccount() { InitialBalance = 100000 };
+            account.ProductSchedule = new List<MortgageProduct>();
+            account.ProductSchedule.Add(new MortgageProduct() { APRRate = 5, Years = 20 });
+
+            var months = calc.GetRepaymentSchedule(account);
+            OutputPayments(account, months);
+        }
+
+        private void OutputPayments(MortgageAccount account, List<RepaymentScheduleMonth> months)
         {
             for (int i = 0; i < months.Count; i++)
             {
-                var x = months[i];
-                Console.WriteLine($"Year {x.Year} - Month {x.Month} - Payment { x.Payment } - Balance {x.RemainingBalance_Total} - Balance Contrib - {x.AmountPaid_Balance} - Interest Contrib - {x.AmountPaid_Interest}");
+                var repayment = months[i];
+                var monthText = repayment.Month >= 10 ? repayment.Month.ToString() : repayment.Month + " ";
+                Console.WriteLine($"Month : {repayment.Year}/{monthText} Pay : { repayment.Payment } Remaining : {repayment.RemainingBalance_Total} CapRemaining : {repayment.RemainingBalance_Capital} CapContrib : {repayment.AmountPaid_Capital} IntContrib : {repayment.AmountPaid_Interest}");
             }
 
-            Console.WriteLine($"Total Payment - {months.Sum(x => x.Payment)}");
+            Console.WriteLine($"Capital Amount : {account.InitialBalance} Term : {account.ProductSchedule.Sum(x => x.Years)} Total Payment : {months.Sum(x => x.Payment)}");
             Console.WriteLine();
         }
     }
